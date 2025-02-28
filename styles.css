@@ -1,0 +1,203 @@
+/* Remove top margin on rich text first child */
+.w-richtext > :first-child {
+  margin-top: 0;
+}
+
+/* Remove bottom margin of rich text last child */
+.w-richtext > :last-child,
+.w-richtext ol li:last-child,
+.w-richtext ul li:last-child {
+  margin-bottom: 0;
+}
+/* Applies an underline to any h1-h6 or p with an anchor link inside. */
+:is(h1, h2, h3, h4, h5, h6, p) a {
+  text-decoration: underline;
+  /* Add or remove any rules here */
+}
+
+video {
+  width: 100%;
+  object-fit: cover;
+}
+
+video.wf-empty {
+  padding: 0;
+}
+/* Hide an object on the canvas but keep it's order in the DOM. Great for making an invisible space in a grid or flexbox. */
+.u-invisible {
+  visibility: hidden;
+}
+
+/* Applies line clamping to the .u-tlc class */
+.u-clamp {
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  &.cc-2 {
+    -webkit-line-clamp: 2;
+  }
+  &.cc-3 {
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* Changes the color of the default Webflow lightbox color */
+.w-lightbox-backdrop {
+  background: rgba(10, 2, 122, 0.8) !important;
+}
+
+/* Desktop (992px and above) */
+@media screen and (min-width: 992px) {
+  .u-md-only,
+  .u-sm-only,
+  .u-xs-only {
+    display: none;
+  }
+}
+
+/* Tablet (768px to 991px) */
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  .u-sm-only,
+  .u-xs-only,
+  .u-lg-only {
+    display: none;
+  }
+}
+
+/* Mobile Landscape (480px to 767px) */
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  .u-lg-only,
+  .u-md-only,
+  .u-xs-only {
+    display: none;
+  }
+}
+
+/* Mobile Portrait (up to 479px) */
+@media screen and (max-width: 479px) {
+  .u-lg-only,
+  .u-md-only,
+  .u-sm-only {
+    display: none;
+  }
+}
+
+.section.for-header:has(.header-bg.u-bg-dark) {
+  [header-color="dynamic"] {
+    color: var(--_colors---colors-main--light);
+    fill: var(--_colors---colors-main--light);
+  }
+  [header-color="burger"] {
+    background-color: var(--_colors---colors-main--light);
+  }
+  .row.for-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  .btn.cc-secondary.for-nav {
+    border-color: var(--_colors---colors-main--light);
+    color: var(--_colors---colors-main--light);
+  }
+  .btn.cc-secondary.for-nav:hover {
+    background-color: hsla(0, 0%, 100%, 0.15);
+  }
+  .header-nav-drpdwn_cont-bl {
+    color: var(--_colors---colors-main--light);
+    background-color: var(--_colors---colors-main--dark);
+  }
+  [header-stroke="dynamic"] {
+    border-color: var(--_colors---colors-main--light);
+  }
+  .header-nav-drpdwn_toggle {
+    color: var(--_colors---colors-main--light);
+  }
+}
+/*
+  [direction="top"]
+  [direction="bot"]
+  [direction="left"]
+  [direction="right"]
+  [direction="top-left"]
+  [direction="top-right"]
+  [direction="bot-left"]
+  [direction="bot-right"]
+  */
+.cheese-grid_item[direction="top-left"] {
+  mask-image: linear-gradient(
+    to top left,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  -webkit-mask-image: linear-gradient(
+    to top left,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+}
+.cheese-grid_item[direction="bot-right"] {
+  mask-image: linear-gradient(
+    to bottom right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+}
+.cheese-grid_item[direction="bot-left"] {
+  mask-image: linear-gradient(
+    to bottom left,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom left,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+}
+.cheese-grid_item[direction="bot"] {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+}
+[global-shadow] {
+  box-shadow: 0 0 100px 0 hsla(37.5, 46.75%, 30.2%, 0.09);
+}
+
+/* 1440
+root {
+  --_spacing---spacing-utility-rem--0-125rem: 0.125rem;
+  --_spacing---spacing-utility-rem--0-25rem: 0.25rem;
+  --_spacing---spacing-utility-rem--0-5rem: 0.5rem;
+  --_spacing---spacing-utility-rem--0-75rem: 0.75rem;
+  --_spacing---spacing-utility-rem--0-875rem: 0.875rem;
+  --_spacing---spacing-utility-rem--1rem: 1rem;
+  --_spacing---spacing-utility-rem--1-125rem: 1.125rem;
+  --_spacing---spacing-utility-rem--1-25rem: 1.25rem;
+  --_spacing---spacing-utility-rem--1-5rem: 1.5rem;
+  --_spacing---spacing-utility-rem--1-75rem: 1.75rem;
+  --_spacing---spacing-utility-rem--2rem: 2rem;
+  --_spacing---spacing-utility-rem--2-5rem: 2.5rem;
+  --_spacing---spacing-utility-rem--3rem: 3rem;
+  --_spacing---spacing-utility-rem--3-5rem: 3.5rem;
+  --_spacing---spacing-utility-rem--4rem: 4rem;
+  --_spacing---spacing-utility-rem--5rem: 5rem;
+  --_spacing---spacing-utility-rem--6rem: 6rem;
+  --_spacing---spacing-utility-rem--7rem: 7rem;
+  --_spacing---spacing-utility-rem--7-5rem: 7.5rem;
+  --_spacing---spacing-utility-rem--8rem: 8rem;
+  --_spacing---spacing-utility-rem--9rem: 9rem;
+  --_spacing---spacing-utility-rem--10rem: 10rem;
+  --_spacing---spacing-layout--container-max-width-90: 90rem;
+  --component-button--border-radius: 0.1rem;
+  --border-radius--border-xs: 0.1rem;
+}
+ */
