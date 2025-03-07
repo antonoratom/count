@@ -114,6 +114,23 @@ $("[dark-section]").each(function () {
   });
 });
 
+//GSAP FOR HEADER ---- WESTGASS
+$("[westgass-section]").each(function () {
+  let stickyBl = gsap.timeline({
+    scrollTrigger: {
+      trigger: $(this),
+      start: "top 1%",
+      end: "bottom 1%",
+      toggleActions: "play reverse play reverse",
+      markers: false,
+      toggleClass: {
+        targets: ".header-bg",
+        className: "u-bg-westgass",
+      },
+    },
+  });
+});
+
 $(window).scroll(function () {
   if ($(window).scrollTop() > 100) {
     $(".header-bg").css("opacity", "1");
