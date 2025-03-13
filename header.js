@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   links.forEach((link, index) => {
     link.addEventListener("mouseenter", function () {
+      // console.log("Hovered index:", index);
       const parentContainer = this.closest(".header-nav-drpdwn_cont-bl");
 
       // Get the dimensions of the hovered link
@@ -38,9 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Map the actual indices to the desired colors
       const colorMap = {
-        3: "rgba(136, 153, 255, 0.1)", // Corrected blue value
-        4: "rgba(68, 114, 99, 0.1)",
-        5: "rgba(116, 194, 185, 0.1)",
+        0: "rgba(136, 153, 255, 0.1)", // Corrected blue value
+        1: "rgba(68, 114, 99, 0.1)",
+        2: "rgba(116, 194, 185, 0.1)",
       };
 
       const bgColor = colorMap[index] || "transparent"; // Default to transparent if index not found
