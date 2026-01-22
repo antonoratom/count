@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Map Dots</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="map-wrapper">
+<img src="https://cdn.prod.website-files.com/696a46c904602bb4b1dc1398/696bb9af032dcbb2198eaba0_a276d1ee7b7877722578d648ce7bc1d8_world%20map.png" class="img-map-item">
+    </div>
+    
+    <div class="map-controls">
+      <h3>Dot Controls</h3>
+      <div class="control-group">
+        <label for="dot-size">
+          Dot Size: <span id="size-value">3.5</span>
+        </label>
+        <input type="range" id="dot-size" min="1" max="10" step="0.5" value="3.5">
+      </div>
+      <div class="control-group">
+        <label for="dot-gap">
+          Dot Gap: <span id="gap-value">10</span>
+        </label>
+        <input type="range" id="dot-gap" min="3" max="20" step="1" value="10">
+      </div>
+      <div class="control-group">
+        <label for="edge-size">
+          Edge Dot Size: <span id="edge-size-value">75%</span>
+        </label>
+        <input type="range" id="edge-size" min="0.2" max="1" step="0.05" value="0.75">
+      </div>
+      <button id="reset-btn" class="reset-button">Reset to Default</button>
+    </div>
+  </div>
+
+  <script src="dots.js"></script>
+</body>
+</html>
