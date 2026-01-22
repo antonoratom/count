@@ -1,0 +1,17 @@
+name = "brick-breaker-leaderboard"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "brick-breaker-scores"
+database_id = "" # Will be generated when you run: wrangler d1 create brick-breaker-scores
+
+# Custom domain routes (requires Cloudflare Pro plan)
+# For free tier, use the default workers.dev domain
+# [env.production]
+# name = "brick-breaker-leaderboard"
+# routes = [
+#   { pattern = "code.anton-atom.com/api/*", zone_name = "anton-atom.com" }
+# ]
+

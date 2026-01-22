@@ -1,0 +1,28 @@
+{
+  "name": "brick-breaker-api",
+  "version": "1.0.0",
+  "description": "Brick Breaker leaderboard API (Node.js or Cloudflare Worker)",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create brick-breaker-scores",
+    "db:migrate": "wrangler d1 execute brick-breaker-scores --file=./schema.sql",
+    "db:query": "wrangler d1 execute brick-breaker-scores --command"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "better-sqlite3": "^9.2.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.19.0"
+  }
+}
+
