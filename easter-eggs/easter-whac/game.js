@@ -83,6 +83,8 @@ const CONFIG = {
   LEADERBOARD_MEDAL_GOLD_SVG: 'assets/medal-gold.svg',
   LEADERBOARD_MEDAL_SILVER_SVG: 'assets/medal-silver.svg',
   LEADERBOARD_MEDAL_BRONZE_SVG: 'assets/medal-bronze.svg',
+  /** Decorative strip at bottom of modal (path relative to `game.js` / `ASSET_BASE`). */
+  EASTER_MODAL_BOTTOM_IMG: 'assets/modal-bottom.png',
   LOTTIE_CDN_URL:
     'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js',
   STORAGE_KEY: 'ewm_leaderboard',
@@ -114,10 +116,16 @@ function applyHostSupabaseOverrides() {
   }
 }
 
+/**
+ * Character art: `type` is optional if `src` has a known extension.
+ * - **svg** — vector; in debug embed, inlined for DevTools; otherwise `<img>`.
+ * - **png**, **webp**, **jpeg** / **jpg**, **gif**, **avif**, or **raster** — bitmap `<img>` (good for heavy SVG masks exported to PNG).
+ * - **lottie** — JSON animation via Lottie.
+ */
 const ASSETS = {
   bunnies: [
-    { id: 'bunny-1', type: 'svg', src: 'assets/bunny-1.svg' },
-    { id: 'bunny-2', type: 'svg', src: 'assets/bunny-2.svg' },
+    { id: 'bunny-1', type: 'svg', src: 'assets/bunny-1.png' },
+    { id: 'bunny-2', type: 'svg', src: 'assets/bunny-2.png' },
   ],
   eggs: [
     { id: 'egg-1', type: 'svg', src: 'assets/egg-1.svg' },
@@ -127,6 +135,33 @@ const ASSETS = {
     { id: 'egg-5', type: 'svg', src: 'assets/egg-5.svg' },
   ],
 };
+
+/** @param {{ type?: string, src: string }} asset */
+function assetLoadKind(asset) {
+  if (!asset || !asset.src) return 'svg';
+  const t = String(asset.type || '')
+    .trim()
+    .toLowerCase();
+  if (t === 'lottie') return 'lottie';
+  if (t === 'svg') return 'svg';
+  if (
+    t === 'png' ||
+    t === 'webp' ||
+    t === 'jpeg' ||
+    t === 'jpg' ||
+    t === 'gif' ||
+    t === 'avif' ||
+    t === 'raster' ||
+    t === 'image' ||
+    t === 'bitmap'
+  ) {
+    return 'raster';
+  }
+  const base = asset.src.split(/[?#]/)[0].toLowerCase();
+  if (/\.(png|webp|jpe?g|gif|avif)$/.test(base)) return 'raster';
+  if (/\.svg$/.test(base)) return 'svg';
+  return 'svg';
+}
 
 let score = 0;
 let timeLeft = CONFIG.GAME_DURATION_SEC;
@@ -317,7 +352,7 @@ async function replaceLeaderboardMedalImgsWithInlineSvg(root) {
  * @returns {Promise<boolean>} true if inline SVG was appended
  */
 async function appendInlineSvgAsset(charEl, asset) {
-  if (asset.type !== 'svg') return false;
+  if (assetLoadKind(asset) !== 'svg') return false;
   try {
     const svg = await fetchAndImportSvg(asset.src);
     charEl.appendChild(svg);
@@ -606,9 +641,19 @@ function mountSkeleton() {
         </div>
       </div>
       <footer class="ewm-footer">
-        <button type="button" class="ewm-close-trigger" id="ewm-close-btn" aria-label="Close game">
-          <span class="ewm-close-trigger__icon" aria-hidden="true">×</span>
-        </button>
+      <button type="button" class="ewm-close-trigger" id="ewm-close-btn" aria-label="Close game">
+        <span class="ewm-close-trigger__icon" aria-hidden="true">×</span>
+      </button>
+        <div class="ewm-modal-bottom" role="presentation" aria-hidden="true">
+          <img
+            class="ewm-modal-bottom__img"
+            src=""
+            alt=""
+            width="800"
+            height="120"
+            decoding="async"
+          />
+        </div>
       </footer>
     </div>
   `;
@@ -643,6 +688,10 @@ function applyVisualConfig() {
     'ewm-character-clip-off',
     CONFIG.USE_CHARACTER_EMERGE_CLIP === false
   );
+  const modalBottomImg = rootEl.querySelector('.ewm-modal-bottom__img');
+  if (modalBottomImg && CONFIG.EASTER_MODAL_BOTTOM_IMG) {
+    modalBottomImg.src = resolveAssetSrc(CONFIG.EASTER_MODAL_BOTTOM_IMG);
+  }
 }
 
 function bindCloseButton() {
@@ -904,7 +953,7 @@ function spawnCharacter(holeEl, holeW) {
   const pool = isBunny ? ASSETS.bunnies : ASSETS.eggs;
   const asset = pool[Math.floor(Math.random() * pool.length)];
 
-  if (asset.type === 'lottie') {
+  if (assetLoadKind(asset) === 'lottie') {
     ensureLottie()
       .then(() => {
         const container = document.createElement('div');
@@ -937,7 +986,7 @@ function spawnCharacter(holeEl, holeW) {
       peepEl.appendChild(img);
       finishMount();
     };
-    if (isDebugEmbed()) {
+    if (isDebugEmbed() && assetLoadKind(asset) === 'svg') {
       appendInlineSvgAsset(peepEl, asset).then((ok) => {
         if (ok) finishMount();
         else mountImg();
@@ -1125,7 +1174,7 @@ function seedDebugArenaCharacters() {
       return;
     }
 
-    if (asset.type === 'lottie') {
+    if (assetLoadKind(asset) === 'lottie') {
       ensureLottie()
         .then(() => {
           const container = document.createElement('div');
@@ -1149,16 +1198,25 @@ function seedDebugArenaCharacters() {
       return;
     }
 
-    appendInlineSvgAsset(peepEl, asset).then((ok) => {
-      if (!ok) {
-        const img = document.createElement('img');
-        img.src = resolveAssetSrc(asset.src);
-        img.alt = '';
-        img.draggable = false;
-        peepEl.appendChild(img);
-      }
+    if (assetLoadKind(asset) === 'svg') {
+      appendInlineSvgAsset(peepEl, asset).then((ok) => {
+        if (!ok) {
+          const img = document.createElement('img');
+          img.src = resolveAssetSrc(asset.src);
+          img.alt = '';
+          img.draggable = false;
+          peepEl.appendChild(img);
+        }
+        showUp();
+      });
+    } else {
+      const img = document.createElement('img');
+      img.src = resolveAssetSrc(asset.src);
+      img.alt = '';
+      img.draggable = false;
+      peepEl.appendChild(img);
       showUp();
-    });
+    }
   });
 }
 

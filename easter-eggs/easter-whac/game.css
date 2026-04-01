@@ -163,8 +163,27 @@
 #ewm-root .ewm-footer {
   flex-shrink: 0;
   display: flex;
-  justify-content: center;
-  padding: 16px 16px max(clamp(20px, 4vh, 32px), env(safe-area-inset-bottom, 0px));
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 40px;
+  position: relative;
+}
+
+/* Easter decorative strip — tune here (asset path: `CONFIG.EASTER_MODAL_BOTTOM_IMG` in game.js). */
+#ewm-root .ewm-modal-bottom {
+  width: 100%;
+  max-width: min(100%, 85rem);
+  flex-shrink: 0;
+}
+
+#ewm-root .ewm-modal-bottom__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
 #ewm-root .ewm-close-trigger {
@@ -182,6 +201,9 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.2s ease, transform 0.15s ease;
+  position: absolute;
+  bottom: 8px;
+  filter: drop-shadow(0 0 14px #000);
 }
 
 #ewm-root .ewm-close-trigger:hover {
@@ -472,31 +494,39 @@
 }
 
 #ewm-root .ewm-leaderboard {
-  width: 100%;
-  max-width: 22rem;
+  width: 200px;
+  max-width: 32rem;
   margin: 1.25rem auto 0;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--ewm-border);
   text-align: left;
-  background: var(--ewm-surface-elevated);
+  display: flex;
+  flex-direction: column;
+  row-gap: 4px;
+  
 }
 
 #ewm-root .ewm-leaderboard__row {
-  display: grid;
-  grid-template-columns: 48px 1fr auto;
+  display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  font-size: 0.9375rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid var(--ewm-border);
-  color: var(--ewm-text-primary);
+  padding: 8px 18px 8px 20px;
+  font-size: 0.875rem;
+  border-radius: 1px;
+  background: linear-gradient(91deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(4.5px);
+  justify-content: space-between;
+    position: relative;
+    height: 36px;
+}
+#ewm-root .ewm-leaderboard__row:nth-of-type(1) {
+  background: linear-gradient(91deg, rgba(255, 215, 0, 0.10) 0%, rgba(255, 255, 255, 0.04) 100%);
+}
+#ewm-root .ewm-leaderboard__row:nth-of-type(2) {
+  background: linear-gradient(91deg, rgba(192, 192, 192, 0.15) 0%, rgba(255, 255, 255, 0.04) 100%);
+}
+#ewm-root .ewm-leaderboard__row:nth-of-type(3) {
+  background: linear-gradient(91deg, rgba(205, 127, 50, 0.15) 0%, rgba(255, 255, 255, 0.04) 100%);
 }
 
-#ewm-root .ewm-leaderboard__row:last-child {
-  border-bottom: none;
-}
 
 #ewm-root .ewm-leaderboard__row--highlight {
   background: rgba(174, 140, 86, 0.15);
@@ -505,8 +535,8 @@
 
 #ewm-root .ewm-leaderboard__medal {
   display: block;
-  width: 36px;
-  height: 36px;
+  width: auto;
+  height: 100%;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -531,6 +561,11 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  position: absolute;
+  left: -10px;
+  top: 4px;
+  width: auto;
+  height: 24px;
 }
 
 #ewm-root .ewm-leaderboard__score {
@@ -657,5 +692,10 @@
 
   #ewm-root .ewm-character {
     bottom: 0%;
+  }
+  #ewm-root .ewm-modal-bottom {
+    width: 360%;
+    max-width: min(360%, 85rem);
+    flex-shrink: 0;
   }
 }
