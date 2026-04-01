@@ -38,20 +38,30 @@ if (images.length > 0) {
 }
 
 // Get all collection items
-const collectionItems = document.querySelectorAll(".products-filter-cl > *");
+const collectionContainer = document.querySelector(".products-filter-cl");
+const collectionItems = collectionContainer?.querySelectorAll(":scope > *") || [];
 
-// Track unique global-tag values
-const uniqueTags = new Set();
+// Keep one element per global-tag
+const uniqueTagMap = new Map();
 
-// Loop through items and remove duplicates
 collectionItems.forEach((item) => {
   const globalTag = item.getAttribute("global-tag");
 
-  if (uniqueTags.has(globalTag)) {
-    // This is a duplicate, remove it
+  if (!globalTag || uniqueTagMap.has(globalTag)) {
     item.remove();
-  } else {
-    // This is unique, add to our set
-    uniqueTags.add(globalTag);
+    return;
   }
+
+  uniqueTagMap.set(globalTag, item);
 });
+
+// Sort unique elements by visible text and re-append
+if (collectionContainer) {
+  const sortedUniqueItems = Array.from(uniqueTagMap.values()).sort((a, b) =>
+    a.textContent.trim().localeCompare(b.textContent.trim(), undefined, {
+      sensitivity: "base",
+    })
+  );
+
+  sortedUniqueItems.forEach((item) => collectionContainer.appendChild(item));
+}

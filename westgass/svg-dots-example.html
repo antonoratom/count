@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG to Dots Example</title>
+  <style>
+    body {
+      padding: 40px;
+      background: #f5f5f5;
+    }
+    
+    svg {
+      background: white;
+      border: 1px solid #ddd;
+      margin: 20px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>SVG Path to Dots Demo</h1>
+  
+  <!-- Example SVGs with paths -->
+  <svg continent-svg width="400" height="300" viewBox="0 0 400 300">
+    <!-- Example: A simple shape path -->
+    <path d="M 50 50 L 350 50 L 350 250 L 50 250 Z" fill="none" stroke="black"/>
+  </svg>
+  
+  <svg continent-svg width="400" height="300" viewBox="0 0 400 300">
+    <!-- Example: A curved path -->
+    <path d="M 50 150 Q 200 50 350 150 Q 200 250 50 150 Z" fill="none" stroke="black"/>
+  </svg>
+  
+  <!-- Load the script -->
+  <script src="svg-to-dots.js"></script>
+</body>
+</html>

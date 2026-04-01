@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Easter Whac-A-Mole — dev preview</title>
+    <link rel="stylesheet" href="./game.css" />
+    <style>
+      /* Dev: shell is position:fixed fullscreen; root just needs to exist */
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #1e2128;
+      }
+      #ewm-root {
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ewm-root"></div>
+    <script src="./game.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,661 @@
+/* Full-screen dark UI — matches Count Easter game screenshot */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+#ewm-root {
+  --ewm-background: #1e2128;
+  --ewm-text-primary: #ffffff;
+  --ewm-text-secondary: #5c5f66;
+  --ewm-button-bg: #b59a5b;
+  --ewm-button-text: #1a1a1a;
+  --ewm-close-btn-bg: #333a45;
+  --ewm-close-btn-hover: #3d4552;
+  --ewm-surface-elevated: #2a2f38;
+  --ewm-border: rgba(255, 255, 255, 0.08);
+  --ewm-egg-pop: #7cb87a;
+  --ewm-bunny-pop: #e57373;
+  --ewm-font: "Inter", system-ui, -apple-system, sans-serif;
+  /* Set from `game.js` `applyVisualConfig()` → `CONFIG.HOLE_OVAL_*`, `CONFIG.CHARACTER_WIDTH_PCT` */
+  --ewm-hole-oval-width-pct: 92;
+  --ewm-hole-oval-height-pct: 12;
+  --ewm-hole-oval-border-px: 1px;
+  --ewm-character-width-pct: 72;
+  position: relative;
+  font-family: var(--ewm-font);
+  color: var(--ewm-text-primary);
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+#ewm-root *,
+#ewm-root *::before,
+#ewm-root *::after {
+  box-sizing: border-box;
+}
+
+#ewm-root[data-ewm-closed="true"] .ewm-shell {
+  display: none;
+}
+
+/* Full viewport overlay (embed can be a small div; shell still covers the screen) */
+#ewm-root .ewm-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--ewm-background);
+}
+
+#ewm-root .ewm-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  flex-shrink: 0;
+  padding: max(clamp(20px, 4vw, 40px), env(safe-area-inset-top, 0px))
+    clamp(20px, 5vw, 56px) 16px;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--ewm-text-secondary);
+  transition: color 0.2s ease;
+}
+
+/* Menu / results: muted HUD; gameplay: bold white (screenshots) */
+#ewm-root.ewm-state-playing .ewm-header {
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Menu / leaderboard / name — centered */
+#ewm-root .ewm-flow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px clamp(20px, 5vw, 56px) 24px;
+  overflow: auto;
+  min-height: 0;
+  text-align: center;
+}
+
+#ewm-root .ewm-flow[hidden] {
+  display: none !important;
+}
+
+#ewm-root .ewm-main {
+  width: 100%;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+#ewm-root .ewm-main__title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.875rem, 5.5vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-main__description {
+  margin: 0 auto 2rem;
+  font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ewm-text-primary);
+  opacity: 0.92;
+}
+
+#ewm-root .ewm-main__button,
+#ewm-root .ewm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 160px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--ewm-button-text);
+  background: var(--ewm-button-bg);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+#ewm-root .ewm-main__button:hover,
+#ewm-root .ewm-btn:hover {
+  filter: brightness(1.06);
+}
+
+#ewm-root .ewm-main__button:active,
+#ewm-root .ewm-btn:active {
+  transform: scale(0.98);
+}
+
+#ewm-root .ewm-btn--secondary,
+#ewm-root .ewm-btn--ghost {
+  background: var(--ewm-surface-elevated);
+  color: var(--ewm-text-primary);
+  border: 1px solid var(--ewm-border);
+}
+
+#ewm-root .ewm-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 16px 16px max(clamp(20px, 4vh, 32px), env(safe-area-inset-bottom, 0px));
+}
+
+#ewm-root .ewm-close-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--ewm-close-btn-bg);
+  color: var(--ewm-text-primary);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+#ewm-root .ewm-close-trigger:hover {
+  background: var(--ewm-close-btn-hover);
+}
+
+#ewm-root .ewm-close-trigger:active {
+  transform: scale(0.95);
+}
+
+#ewm-root .ewm-close-trigger__icon {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+/* Gameplay */
+#ewm-root .ewm-game-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 clamp(12px, 3vw, 24px) 8px;
+}
+
+#ewm-root .ewm-game-wrap[hidden] {
+  display: none !important;
+}
+
+#ewm-root .ewm-arena {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 260px;
+  max-height: 75vh;
+  border-radius: 0;
+  background: var(--ewm-background);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#ewm-root .ewm-hole {
+  position: absolute;
+  pointer-events: none;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 0;
+}
+
+/* White oval ring — size from CONFIG (see `#ewm-root` vars + `applyVisualConfig`) */
+#ewm-root .ewm-hole__oval {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: calc(var(--ewm-hole-oval-width-pct) * 1%);
+  height: calc(var(--ewm-hole-oval-height-pct) * 1%);
+  border: var(--ewm-hole-oval-border-px) solid rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* SVG clip defs live as `#ewm-root > .ewm-defs` (sibling of .ewm-shell, not inside overflow:hidden). */
+#ewm-root > .ewm-defs {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  opacity: 0;
+  border: 0;
+  pointer-events: none;
+}
+
+/* Curved “portal” — SVG clip-path only (no `bottom`; align via hole layout + peep transforms). */
+#ewm-root .ewm-character {
+  position: absolute;
+  left: 50%;
+  bottom: 0%;
+  width: 100%;
+  max-width: 100%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
+  -webkit-clip-path: url(#ewm-emerge-clip);
+  clip-path: url(#ewm-emerge-clip);
+}
+
+/* Motion + hit target on inner peep (live spawns + debug-static). */
+#ewm-root .ewm-character .ewm-character__peep {
+  display: block;
+  width: 100%;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.45, 0.64, 1);
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#ewm-root .ewm-character:not(.ewm-character--debug-static) .ewm-character__peep.ewm-character--up {
+  transform: translateY(24%);
+}
+
+#ewm-root .ewm-character--debug-static {
+  transition: none;
+}
+
+#ewm-root .ewm-character--debug-static .ewm-character__peep.ewm-character--up:not(.ewm-character__peep--bob) {
+  transform: translateY(30%);
+}
+
+#ewm-root .ewm-character--debug-static .ewm-character__peep.ewm-character__peep--bob {
+  animation: ewm-debug-bob 2.4s ease-in-out infinite alternate;
+  transition: none;
+}
+
+@keyframes ewm-debug-bob {
+  from {
+    transform: translateY(26%);
+  }
+
+  to {
+    transform: translateY(36%);
+  }
+}
+
+#ewm-root.ewm-character-clip-off .ewm-character {
+  -webkit-clip-path: none;
+  clip-path: none;
+}
+
+#ewm-root .ewm-character:has(.ewm-character__placeholder) {
+  width: auto;
+  max-width: 85%;
+}
+
+#ewm-root .ewm-character__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.5rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.65rem;
+  background: #c8ccd4;
+  color: #0a0a0a;
+  font-weight: 800;
+  font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+  letter-spacing: 0.02em;
+  border-radius: 2px;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+#ewm-root .ewm-character img,
+#ewm-root .ewm-character .ewm-character__svg-root,
+#ewm-root .ewm-character .ewm-character__lottie {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Inline SVG: direct hit target; clicks still bubble to `.ewm-character__peep`. */
+#ewm-root .ewm-character__peep .ewm-character__svg-root {
+  pointer-events: auto;
+}
+
+#ewm-root .ewm-character__lottie {
+  min-height: 48px;
+}
+
+#ewm-root .ewm-character:not(.ewm-character--debug-static) .ewm-character__peep.ewm-character--hit {
+  animation: ewm-spawn-peep-hit 0.38s ease forwards;
+}
+
+@keyframes ewm-spawn-peep-hit {
+  0% {
+    transform: translateY(30%) scale(1);
+    opacity: 1;
+  }
+
+  40% {
+    transform: translateY(22%) scale(1.12);
+  }
+
+  100% {
+    transform: translateY(30%) scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* Filter-only so bob / translateY on the peep are not overwritten mid-animation */
+#ewm-root .ewm-character--debug-static .ewm-character__peep.ewm-character--hit {
+  animation: ewm-debug-peep-hit 0.38s ease forwards;
+}
+
+@keyframes ewm-debug-peep-hit {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  40% {
+    filter: brightness(1.18);
+  }
+}
+
+#ewm-root .ewm-score-pop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  font-weight: 800;
+  font-size: 1.35rem;
+  pointer-events: none;
+  animation: ewm-score-pop 0.85s ease forwards;
+}
+
+#ewm-root .ewm-score-pop--plus {
+  color: var(--ewm-egg-pop);
+}
+
+#ewm-root .ewm-score-pop--minus {
+  color: var(--ewm-bunny-pop);
+}
+
+@keyframes ewm-score-pop {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -48px) scale(1.05);
+  }
+}
+
+/* Secondary screens: leaderboard, name */
+#ewm-root .ewm-screen__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 1.25rem;
+}
+
+#ewm-root .ewm-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+  text-align: left;
+  width: 100%;
+  max-width: 24rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#ewm-root .ewm-name-form label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-name-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--ewm-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 1rem;
+  background: var(--ewm-surface-elevated);
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-name-input:focus {
+  outline: 2px solid var(--ewm-button-bg);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+#ewm-root .ewm-leaderboard {
+  width: 100%;
+  max-width: 22rem;
+  margin: 1.25rem auto 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--ewm-border);
+  text-align: left;
+  background: var(--ewm-surface-elevated);
+}
+
+#ewm-root .ewm-leaderboard__row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--ewm-border);
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-leaderboard__row:last-child {
+  border-bottom: none;
+}
+
+#ewm-root .ewm-leaderboard__row--highlight {
+  background: rgba(174, 140, 86, 0.15);
+  font-weight: 700;
+}
+
+#ewm-root .ewm-leaderboard__medal {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+#ewm-root svg.ewm-leaderboard__medal {
+  overflow: visible;
+}
+
+#ewm-root .ewm-leaderboard__rank--empty {
+  width: 36px;
+  min-width: 36px;
+}
+
+#ewm-root .ewm-leaderboard__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#ewm-root .ewm-leaderboard__rank {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#ewm-root .ewm-leaderboard__score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ewm-text-primary);
+}
+
+/* Leaderboard entry (name) screen */
+#ewm-root .ewm-leaderboard-entry__title {
+  margin: 0 0 2rem;
+  font-size: clamp(1.5rem, 4.5vw, 2.125rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-leaderboard-entry__form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 22rem;
+  margin: 0 auto;
+  text-align: left;
+}
+
+#ewm-root .ewm-leaderboard-entry__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ewm-text-secondary);
+}
+
+#ewm-root .ewm-leaderboard-entry__input {
+  width: 100%;
+  padding: 0.35rem 0 0.6rem;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 0;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ewm-text-primary);
+  background: transparent;
+}
+
+#ewm-root .ewm-leaderboard-entry__input::placeholder {
+  color: var(--ewm-text-secondary);
+  opacity: 0.85;
+}
+
+#ewm-root .ewm-leaderboard-entry__input:focus {
+  outline: none;
+  border-bottom-color: var(--ewm-button-bg);
+}
+
+#ewm-root .ewm-leaderboard-entry__button {
+  align-self: center;
+  margin-top: 0.25rem;
+  min-height: 48px;
+  min-width: 200px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 0;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: var(--ewm-button-text);
+  background: var(--ewm-button-bg);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#ewm-root .ewm-leaderboard-entry__button:hover {
+  filter: brightness(1.07);
+}
+
+#ewm-root .ewm-button--restart {
+  border-radius: 4px;
+}
+
+#ewm-root .ewm-error {
+  margin-top: 12px;
+  font-size: 0.875rem;
+  color: var(--ewm-bunny-pop);
+}
+
+/* Legacy class aliases used in JS innerHTML */
+#ewm-root .ewm-screen__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--ewm-text-primary);
+}
+
+#ewm-root .ewm-screen__body {
+  margin: 0 auto 1rem;
+  max-width: 28rem;
+  font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ewm-text-primary);
+  opacity: 0.9;
+}
+
+#ewm-root .ewm-screen__title-accent {
+  color: var(--ewm-text-primary);
+}
+
+/* Match `CONFIG.HOLE_MOBILE_BREAKPOINT_PX` — tighter arena + safe-area padding */
+@media (max-width: 640px) {
+  #ewm-root .ewm-game-wrap {
+    padding-left: max(10px, env(safe-area-inset-left, 0px));
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+  }
+
+  #ewm-root .ewm-arena {
+    min-height: 220px;
+  }
+
+  #ewm-root .ewm-character {
+    bottom: 0%;
+  }
+}
