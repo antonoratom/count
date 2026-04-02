@@ -1,6 +1,10 @@
 /**
  * Easter Whac-A-Mole — vanilla embed for Webflow
  * Mounts into #ewm-root
+ *
+ * **Hidden until opened (production):** add `data-ewm-start-closed` on `#ewm-root`, or set
+ * `CONFIG.START_WITH_MODAL_CLOSED: true`. Put class `easter-egg-trigger` on any control; clicks
+ * delegate from `document` and call `window.ewmReopen()`. Or call `ewmReopen()` from your own JS.
  */
 const CONFIG = {
   SUPABASE_URL: 'https://zsggcbrpkgetnbleuxuq.supabase.co',
@@ -90,6 +94,11 @@ const CONFIG = {
   STORAGE_KEY: 'ewm_leaderboard',
   /** Optional base for assets (same folder as game.js on CDN). Empty = derive from script URL. */
   ASSET_BASE: '',
+  /**
+   * If `true`, modal stays hidden until `ewmReopen()` / `.easter-egg-trigger` (ignored when
+   * debug layout QA is active). Prefer `#ewm-root[data-ewm-start-closed]` on the host page.
+   */
+  START_WITH_MODAL_CLOSED: false,
   /** `true` = grey Egg/Rabbit blocks; `false` = use `ASSETS` (svg / lottie). */
   USE_PLACEHOLDER_CHARACTERS: false,
 
@@ -300,7 +309,35 @@ function resolveAssetSrc(relativePath) {
 /** Any `DEBUG_START_SCREEN` value → layout QA mode: inline SVG in DOM (clipPath), static demo characters in arena. */
 function isDebugEmbed() {
   const s = CONFIG.DEBUG_START_SCREEN;
-  return s != null && String(s).trim() !== '';
+  const id = String(s == null ? '' : s).trim().toLowerCase();
+  return id !== '' && id !== 'null';
+}
+
+let ewmHostTriggerDelegated = false;
+
+function shouldStartWithModalClosed() {
+  if (isDebugEmbed()) return false;
+  if (rootEl && rootEl.hasAttribute('data-ewm-start-closed')) return true;
+  return CONFIG.START_WITH_MODAL_CLOSED === true;
+}
+
+/** Clicks on `.easter-egg-trigger` (anywhere on the page) open the game modal. */
+function bindEasterEggHostTrigger() {
+  if (ewmHostTriggerDelegated) return;
+  ewmHostTriggerDelegated = true;
+  document.addEventListener(
+    'click',
+    (e) => {
+      const el =
+        e.target &&
+        typeof e.target.closest === 'function' &&
+        e.target.closest('.easter-egg-trigger');
+      if (!el) return;
+      e.preventDefault();
+      if (typeof window.ewmReopen === 'function') window.ewmReopen();
+    },
+    false
+  );
 }
 
 /**
@@ -701,12 +738,40 @@ function bindCloseButton() {
   btn.addEventListener('click', closeEmbed);
 }
 
-/** Hides full-screen shell. Listen: `window.addEventListener('ewm:close', …)`. Reopen from host page: `ewmReopen()` global or `document.querySelector('#ewm-root').removeAttribute('data-ewm-closed')` then trigger your open UI. */
+/** Hides full-screen shell after footer exit animation. Listen: `window.addEventListener('ewm:close', …)`. */
+function clearEwmModalClosing() {
+  if (rootEl) rootEl.classList.remove('ewm-modal--closing');
+}
+
+/** Match `--ewm-modal-footer-dur` in game.css (+ buffer). */
+const EWM_MODAL_FOOTER_ANIM_MS = 520;
+
 function closeEmbed() {
   if (!rootEl) return;
   resetGame();
-  rootEl.dataset.ewmClosed = 'true';
-  window.dispatchEvent(new CustomEvent('ewm:close', { bubbles: true }));
+  if (rootEl.getAttribute('data-ewm-closed') === 'true') return;
+  if (rootEl.classList.contains('ewm-modal--closing')) return;
+
+  const footer = rootEl.querySelector('.ewm-footer');
+  let settled = false;
+  const applyClosed = () => {
+    if (settled) return;
+    settled = true;
+    footer?.removeEventListener('transitionend', onEnd);
+    clearTimeout(fallback);
+    rootEl.classList.remove('ewm-modal--closing');
+    rootEl.dataset.ewmClosed = 'true';
+    window.dispatchEvent(new CustomEvent('ewm:close', { bubbles: true }));
+  };
+  const onEnd = (e) => {
+    if (e.target !== footer) return;
+    if (e.propertyName !== 'transform') return;
+    applyClosed();
+  };
+
+  rootEl.classList.add('ewm-modal--closing');
+  footer?.addEventListener('transitionend', onEnd);
+  const fallback = setTimeout(applyClosed, EWM_MODAL_FOOTER_ANIM_MS);
 }
 
 function showFlowScreen() {
@@ -1235,6 +1300,7 @@ function resetGame() {
 function startGame() {
   resetGame();
   gameRunning = true;
+  clearEwmModalClosing();
   rootEl.removeAttribute('data-ewm-closed');
   showGameScreen();
   lastRemainMs = CONFIG.GAME_DURATION_SEC * 1000;
@@ -1459,6 +1525,7 @@ function debugMockLeaderboard() {
  */
 function openDebugScreen(screen) {
   const id = (screen == null ? '' : String(screen)).trim().toLowerCase();
+  clearEwmModalClosing();
   rootEl.removeAttribute('data-ewm-closed');
 
   switch (id) {
@@ -1512,16 +1579,22 @@ function init() {
     return;
   }
   mountSkeleton();
+  bindEasterEggHostTrigger();
   window.ewmReopen = function ewmReopen() {
+    clearEwmModalClosing();
     rootEl.removeAttribute('data-ewm-closed');
     resetGame();
-    if (CONFIG.DEBUG_START_SCREEN) {
+    if (isDebugEmbed()) {
       openDebugScreen(CONFIG.DEBUG_START_SCREEN);
     } else {
       showStartScreen();
     }
   };
-  if (CONFIG.DEBUG_START_SCREEN) {
+  if (shouldStartWithModalClosed()) {
+    rootEl.dataset.ewmClosed = 'true';
+    return;
+  }
+  if (isDebugEmbed()) {
     console.info('[ewm] DEBUG_START_SCREEN =', CONFIG.DEBUG_START_SCREEN);
     openDebugScreen(CONFIG.DEBUG_START_SCREEN);
   } else {

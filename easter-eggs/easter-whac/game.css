@@ -19,6 +19,8 @@
   --ewm-hole-oval-height-pct: 12;
   --ewm-hole-oval-border-px: 1px;
   --ewm-character-width-pct: 72;
+  --ewm-modal-footer-dur: 0.35s;
+  --ewm-modal-footer-ease: cubic-bezier(0.34, 1.28, 0.64, 1);
   position: relative;
   font-family: var(--ewm-font);
   color: var(--ewm-text-primary);
@@ -33,7 +35,7 @@
 }
 
 #ewm-root[data-ewm-closed="true"] .ewm-shell {
-  display: none;
+  visibility: hidden;
 }
 
 /* Full viewport overlay (embed can be a small div; shell still covers the screen) */
@@ -48,7 +50,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--ewm-background);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  background: rgba(33, 37, 44, 0.97);
+  visibility: visible;
+  transition: visibility var(--ewm-modal-footer-dur) ease, background var(--ewm-modal-footer-dur) ease, backdrop-filter var(--ewm-modal-footer-dur) ease;
 }
 
 #ewm-root .ewm-header {
@@ -65,7 +71,14 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   color: var(--ewm-text-secondary);
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, opacity var(--ewm-modal-footer-dur) ease, transform var(--ewm-modal-footer-dur) ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+.ewm-body{
+  transition: opacity var(--ewm-modal-footer-dur) ease, transform var(--ewm-modal-footer-dur) ease;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Menu / results: muted HUD; gameplay: bold white (screenshots) */
@@ -169,11 +182,47 @@
   gap: 12px;
   padding: 0 40px;
   position: relative;
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  transform-origin: center bottom;
+  transition:
+    transform var(--ewm-modal-footer-dur) var(--ewm-modal-footer-ease),
+    opacity var(--ewm-modal-footer-dur) var(--ewm-modal-footer-ease);
+}
+#ewm-root[data-ewm-closed="true"] .ewm-shell,
+#ewm-root.ewm-modal--closing .ewm-shell {
+  background: rgba(33, 37, 44, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+}
+/* Exit / start-closed: same values so open ↔ close reverse with identical timing. */
+#ewm-root[data-ewm-closed="true"] .ewm-footer,
+#ewm-root.ewm-modal--closing .ewm-footer {
+  transform: translateY(24px) scale(0.76);
+  opacity: 0;
+}
+#ewm-root[data-ewm-closed="true"] .ewm-header,
+#ewm-root.ewm-modal--closing .ewm-header {
+  transform: translateY(-24px);
+  opacity: 0;
+}
+#ewm-root[data-ewm-closed="true"] .ewm-body,
+#ewm-root.ewm-modal--closing .ewm-body {
+  transform: translateY(24px);
+  opacity: 0;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  #ewm-root {
+    --ewm-modal-footer-dur: 0.16s;
+    --ewm-modal-footer-ease: ease;
+  }
 }
 
 /* Easter decorative strip — tune here (asset path: `CONFIG.EASTER_MODAL_BOTTOM_IMG` in game.js). */
 #ewm-root .ewm-modal-bottom {
-  width: 100%;
+  width: calc(100% + 300px);
   max-width: min(100%, 85rem);
   flex-shrink: 0;
 }
